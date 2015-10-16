@@ -1,50 +1,81 @@
 import numpy as np
 import cv2
-import cv
-from locator.MarkerTracker import *
 
-cap = cv2.VideoCapture(0)
+from ar_markers.hamming.detect import detect_markers
 
-template = cv2.imread('template.png',0)
-w, h = template.shape[::-1]
+markers = {
+    #2841: { 'x': 47, 'y': 28, 'size': 32 },
+    1002: { 'x': 222, 'y': 28, 'size': 32 },
+    3172: { 'x': 47, 'y': 148, 'size': 32 },
+    2553: { 'x': 221, 'y': 148, 'size': 32 }
+}
 
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+paper_size = (295, 210)
 
-    # Our operations on the frame come here
-    height, width = frame.shape[:2]
-    print height, width
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    small = cv2.resize(gray, (width / 2, height / 2))
-    #ret, thresh = cv2.threshold(small, 127, 255, cv2.THRESH_BINARY)
-    thresh = cv2.adaptiveThreshold(small, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 5)
-    result = cv2.cvtColor(thresh, cv2.COLOR_GRAY2RGB)
+def cals_transform(points):
+    a = []
+    b = []
 
-    res = cv2.matchTemplate(thresh, template, cv2.TM_CCOEFF)
+    point1 = points[0]
+    marker1 = markers[point1['id']]
+    point2 = points[1]
+    marker2 = markers[point2['id']]
+    point3 = points[2]
+    marker3 = markers[point3['id']]
 
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-    threshold = max_val * 0.8
-    loc = np.where(res >= threshold)
-    for pt in zip(*loc[::-1]):
-        cv2.rectangle(result, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-    print min_val, max_val
+    a.append([marker1['x'], marker1['y']])
+    b.append([point1['x'], point1['y']])
+
+    a.append([marker2['x'], marker2['y']])
+    b.append([point2['x'], point2['y']])
+
+    a.append([marker3['x'], marker3['y']])
+    b.append([point3['x'], point3['y']])
+
+    pts2 = np.float32(a)
+    pts1 = np.float32(b)
+
+    return cv2.getAffineTransform(pts1, pts2)
 
 
-    #template = cv2.imread('mario_coin.png',0)
-    #w, h = template.shape[::-1]
+if __name__ == '__main__':
+    capture = cv2.VideoCapture(0)
 
-    #res = cv2.matchTemplate(img_gray,template, cv2.TM_CCOEFF_NORMED)
-    #threshold = 0.8
-    #oc = np.where( res >= threshold)
-    #for pt in zip(*loc[::-1]):
-    #    cv2.rectangle(frame, pt, (pt[0] + w, pt[1] + h), (0,0,255), 2)
+    if capture.isOpened(): # try to get the first frame
+        frame_captured, frame = capture.read()
+    else:
+        frame_captured = False
+    while frame_captured:
+        h, w = frame.shape[:2]
 
-    # Display the resulting frame
-    cv2.imshow('frame', result)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        dm = detect_markers(frame)
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+        top_left = { 'x': 0, 'y': 0 }
+        bottom_right = { 'x': 0, 'y': 0 }
+
+        points = []
+        point_ids = []
+        for marker in dm:
+            if marker.id in markers and not marker.id in point_ids:
+                marker.highlite_marker(frame)
+                point_ids.append(marker.id)
+                points.append({ 'id': marker.id, 'x': marker.center[0], 'y': marker.center[1] })
+
+        if len(points) > 2:
+            for p in points:
+                print p['id']
+            print '------'
+            m = cals_transform(points)
+            if m != None :
+                #print m.cols
+                #print cv2.transform(np.array([[0, 0, 0]]), m)
+                frame = cv2.warpAffine(frame, m, paper_size)
+
+        cv2.imshow('Test Frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        frame_captured, frame = capture.read()
+
+    # When everything done, release the capture
+    capture.release()
+    cv2.destroyAllWindows()
