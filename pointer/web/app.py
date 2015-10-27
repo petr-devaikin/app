@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from ar_markers.hamming.detect import detect_markers
 import base64
+from adapter import Adapter
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('default_settings')
@@ -17,9 +18,9 @@ def index():
 
 @app.route('/gesture', methods=['POST'])
 def gesture():
-    print 'New Gesture!'
     img = grab_image(request.form['img'])
-    print 'Resolution: %s %s' % img.shape[:2]
+    #print 'New gesture! Resolution: %s %s' % img.shape[:2]
+    height, width = img.shape[:2]
 
     dm = detect_markers(img)
 
@@ -31,14 +32,17 @@ def gesture():
             point_ids.append(marker.id)
             points.append({ 'id': marker.id, 'x': marker.center[0], 'y': marker.center[1] })
 
-    print 'Markers found: %s' % len(points)
+    #print 'Markers found: %s' % len(points)
     if len(points) > 2:
-        for p in points:
-            print p['id']
-        print '------'
+        #for p in points:
+        #    print p['id']
+        #print '------'
         m = cals_transform(points)
-        if m != None :
+        if m != None:
             print 'Transformed'
+            p = np.float32([width / 2, height / 2, 1])
+            pt = p.dot(m.T)
+            Adapter.send_gesture(pt[0], pt[1], 'tap')
             #print m.cols
             #print cv2.transform(np.array([[0, 0, 0]]), m)
             #frame = cv2.warpAffine(frame, m, paper_size)
@@ -80,6 +84,7 @@ def cals_transform(points):
 
     return cv2.getAffineTransform(pts1, pts2)
 
+
 #test
 
 @app.route('/test/resolution')
@@ -89,8 +94,13 @@ def test_resolution():
 
 @app.route('/test/gesture', methods=['POST'])
 def test_gesture():
+    print 'TEST NEW GESTURE'
+    x = request.form['x']
+    y = request.form['y']
+    gesture = request.form['gesture']
+    print 'x: %s  y: %s  gesture: %s' % (x, y, gesture)
     return jsonify(result='ok')
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=True)
