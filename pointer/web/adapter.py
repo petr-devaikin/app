@@ -1,6 +1,7 @@
 import requests
 from flask import current_app
 import urlparse
+import json
 
 class Adapter:
     @staticmethod
@@ -10,8 +11,13 @@ class Adapter:
         return res
 
     @staticmethod
-    def send_gesture(x, y, gesture):
+    def send_gesture(x, y, action):
         url = urlparse.urljoin(current_app.config['DRAWER_URL'], 'gesture')
         print url
-        res = requests.post(url, data={ "x": x, "y": y, "gesture": gesture })
+        data = {
+            'x': x,
+            'y': y,
+            'action': action
+        }
+        res = requests.post(url, data={ 'data': json.dumps(data) })
 

@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
 
-import numpy as np
-import cv2
-from ar_markers.hamming.detect import detect_markers
 import base64
+
 from adapter import Adapter
+from transform import transform
+import json
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('default_settings')
@@ -18,71 +18,26 @@ def index():
 
 @app.route('/gesture', methods=['POST'])
 def gesture():
-    img = grab_image(request.form['img'])
+    data = json.loads(request.form['data'])
+    img = grab_image(data['img'])
+    x = data['x']
+    y = data['y']
+    action = data['action']
+
     #print 'New gesture! Resolution: %s %s' % img.shape[:2]
-    height, width = img.shape[:2]
+    coords = transform(img, x, y)
 
-    dm = detect_markers(img)
-
-    points = []
-    point_ids = []
-    for marker in dm:
-        if marker.id in app.config['MARKERS'] and not marker.id in point_ids:
-            #marker.highlite_marker(img)
-            point_ids.append(marker.id)
-            points.append({ 'id': marker.id, 'x': marker.center[0], 'y': marker.center[1] })
-
-    #print 'Markers found: %s' % len(points)
-    if len(points) > 2:
-        #for p in points:
-        #    print p['id']
-        #print '------'
-        m = cals_transform(points)
-        if m != None:
-            print 'Transformed'
-            p = np.float32([width / 2, height / 2, 1])
-            pt = p.dot(m.T)
-            Adapter.send_gesture(pt[0], pt[1], 'tap')
-            #print m.cols
-            #print cv2.transform(np.array([[0, 0, 0]]), m)
-            #frame = cv2.warpAffine(frame, m, paper_size)
-
-    return jsonify(result='ok')
+    if coords != None:
+        Adapter.send_gesture(coords[0], coords[1], action)
+        return jsonify(result='ok')
+    else:
+        return jsonify(result='cannot find markers'), 404
 
 
 def grab_image(stream):
     b64 = stream
     data = base64.b64decode(b64)
-    #data = stream.read()
-    image = np.asarray(bytearray(data), dtype="uint8")
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    return image
-
-
-def cals_transform(points):
-    a = []
-    b = []
-
-    point1 = points[0]
-    marker1 = app.config['MARKERS'][point1['id']]
-    point2 = points[1]
-    marker2 = app.config['MARKERS'][point2['id']]
-    point3 = points[2]
-    marker3 = app.config['MARKERS'][point3['id']]
-
-    a.append([marker1['x'], marker1['y']])
-    b.append([point1['x'], point1['y']])
-
-    a.append([marker2['x'], marker2['y']])
-    b.append([point2['x'], point2['y']])
-
-    a.append([marker3['x'], marker3['y']])
-    b.append([point3['x'], point3['y']])
-
-    pts2 = np.float32(a)
-    pts1 = np.float32(b)
-
-    return cv2.getAffineTransform(pts1, pts2)
+    return data
 
 
 #test
@@ -95,10 +50,12 @@ def test_resolution():
 @app.route('/test/gesture', methods=['POST'])
 def test_gesture():
     print 'TEST NEW GESTURE'
-    x = request.form['x']
-    y = request.form['y']
-    gesture = request.form['gesture']
-    print 'x: %s  y: %s  gesture: %s' % (x, y, gesture)
+    data = json.loads(request.form['data'])
+    x = data['x']
+    y = data['y']
+    action = data['action']
+    print 'x: %s  y: %s  action: %s' % (x, y, action)
+
     return jsonify(result='ok')
 
 
