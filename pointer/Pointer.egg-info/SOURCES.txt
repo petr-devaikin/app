@@ -1,0 +1,7 @@
+setup.py
+Pointer.egg-info/PKG-INFO
+Pointer.egg-info/SOURCES.txt
+Pointer.egg-info/dependency_links.txt
+Pointer.egg-info/not-zip-safe
+Pointer.egg-info/requires.txt
+Pointer.egg-info/top_level.txt
