@@ -1,5 +1,8 @@
 DEBUG = True
 
+TEST_DRAWER = True
+DISABLE_CV = True
+
 #DRAWER_URL = 'http://127.0.0.1:5000/test/'
 DRAWER_URL = 'http://192.168.137.1:3000/'
 

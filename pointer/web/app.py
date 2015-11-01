@@ -3,13 +3,17 @@ from flask import Flask, jsonify, request
 import base64
 
 from adapter import Adapter
-from transform import transform
 import json
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('default_settings')
 app.config.from_pyfile('application.cfg', silent=True)
 
+
+if not app.config['DISABLE_CV']:
+    from transform import transform
+else:
+    from test_transform import transform
 
 @app.route('/')
 def index():

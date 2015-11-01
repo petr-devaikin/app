@@ -5,15 +5,10 @@ import json
 
 class Adapter:
     @staticmethod
-    def get_resolution():
-        url = urlparse.urljoin(current_app.config['DRAWER_URL'], 'resolution')
-        res = requests.get(url)
-        return res
-
-    @staticmethod
     def send_gesture(x, y, action):
-        url = urlparse.urljoin(current_app.config['DRAWER_URL'], 'gesture')
-        print url
+        base_url = 'http://127.0.0.1:5000/test/' if current_app.config['TEST_DRAWER'] else current_app.config['DRAWER_URL']
+
+        url = urlparse.urljoin(base_url, 'gesture')
         data = {
             'x': x,
             'y': y,

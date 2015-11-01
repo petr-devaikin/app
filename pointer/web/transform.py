@@ -4,6 +4,7 @@ from ar_markers.hamming.detect import detect_markers
 import numpy as np
 import cv2
 
+
 def transform(img_data, x, y):
     img = convert_image(img_data)
     dm = detect_markers(img)
@@ -28,7 +29,6 @@ def transform(img_data, x, y):
             return (pt[0], pt[1])
 
     return None
-
 
 def convert_image(data):
     image = np.asarray(bytearray(data), dtype="uint8")
