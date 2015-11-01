@@ -9,8 +9,10 @@ requirements:
 2) Go to the project directory (pointer)
 3) Create new virtualenv dir:
 > virtualenv venv
+
 4) activate virtual environment:
 > . /venv/bin/activate
+
 (to deactivate virtualenv run command 'deactivate')
 5) install dependencies:
 python setup.py develop
@@ -20,6 +22,7 @@ python setup.py develop
 By default app is in a test mode (see TEST_DRAWER and DISABLE_CV in default_settings.py)
 Command to run application:
 > python web/app.py
+
 
 Server will be ran at 127.0.0.1:3000
 
