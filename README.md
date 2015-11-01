@@ -29,14 +29,22 @@ Server will be ran at 127.0.0.1:3000
 Server can receive POST request with JSON params:
 
 > { data: {
-        x: 123,
-        y: 321,
-        img: 'base64/...'   // - base64 encoded image
-        action: {
-            ...             // - description of the action: tap, swipe, text, whatever
-        }
-    }
-}
+
+>        x: 123,
+
+>        y: 321,
+
+>        img: 'base64/...'   // - base64 encoded image
+
+>        action: {
+
+>             ...             // - description of the action: tap, swipe, text, whatever
+
+>        }
+
+>    }
+
+>}
 
 
 
