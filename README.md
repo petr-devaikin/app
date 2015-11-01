@@ -27,7 +27,8 @@ Command to run application:
 Server will be ran at 127.0.0.1:3000
 
 Server can receive POST request with JSON params:
-{ data: {
+
+> { data: {
         x: 123,
         y: 321,
         img: 'base64/...'   // - base64 encoded image
@@ -36,5 +37,7 @@ Server can receive POST request with JSON params:
         }
     }
 }
+
+
 
 Request will be forwarder to the drawing application with transformed coordinates. Action will be the same.
