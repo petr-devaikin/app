@@ -22,8 +22,7 @@ def index():
 
 @app.route('/gesture', methods=['POST'])
 def gesture():
-    data = json.loads(request.form['data'])
-    img = grab_image(data['img'])
+    img = grab_image(request.data)
     x = data['x']
     y = data['y']
     action = data['action']
@@ -64,4 +63,4 @@ def test_gesture():
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(threaded=True, host='0.0.0.0')
