@@ -22,7 +22,8 @@ def index():
 
 @app.route('/gesture', methods=['POST'])
 def gesture():
-    img = grab_image(request.data)
+    data = json.loads(request.data)
+    img = grab_image(data['img'])
     x = data['x']
     y = data['y']
     action = data['action']
