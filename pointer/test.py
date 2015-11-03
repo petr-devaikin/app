@@ -22,9 +22,12 @@ if __name__ == '__main__':
         r, img = cv2.imencode('.jpg', frame)
         b64 = base64.encodestring(img)
 
-        requests.post('http://127.0.0.1:5000/image', data=json.dumps({ 'img': b64 }) )
+        #requests.post('http://127.0.0.1:5000/image', data=json.dumps({ 'img': b64 }) )
+        print type(img)
+        requests.post('http://127.0.0.1:5000/image', files={ 'img': img.tobytes() })
 
-        if cv2.waitKey(1) & 0xFF == ord('p'):
+        key = cv2.waitKey(1)
+        if key & 0xFF == ord('p'):
             data = {
                 'x': x,
                 'y': y,
@@ -33,9 +36,9 @@ if __name__ == '__main__':
                 }
             }
             requests.post('http://127.0.0.1:5000/gesture', data=json.dumps(data) )
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        elif key & 0xFF == ord('q'):
             break
+
         frame_captured, frame = capture.read()
 
     # When everything done, release the capture

@@ -25,15 +25,21 @@ matrix = None
 
 @app.route('/image', methods=['POST'])
 def image():
-    data = json.loads(request.data)
-    img = grab_image(data['img'])
+    if 'img' in request.files:
+        print 'get image file'
+        img = request.files['img'].read()
+    else:
+        print 'get base64 image'
+        data = json.loads(request.data)
+        img = grab_image(data['img'])
+
     m = get_matrix(img)
     if m != None:
         global matrix
         matrix = m
-        return jsonify(result='cannot find markers'), 404
-    else:
         return jsonify(result='ok')
+    else:
+        return jsonify(result='cannot find markers'), 404
 
 
 @app.route('/gesture', methods=['POST'])
