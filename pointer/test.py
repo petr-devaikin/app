@@ -22,16 +22,17 @@ if __name__ == '__main__':
         r, img = cv2.imencode('.jpg', frame)
         b64 = base64.encodestring(img)
 
-        data = {
-            'x': x,
-            'y': y,
-            'img': b64,
-            'action': {
-                'type': 'tap'
-            }
-        }
+        requests.post('http://127.0.0.1:5000/image', data=json.dumps({ 'img': b64 }) )
 
-        requests.post('http://127.0.0.1:5000/gesture', data=json.dumps(data) )
+        if cv2.waitKey(1) & 0xFF == ord('p'):
+            data = {
+                'x': x,
+                'y': y,
+                'action': {
+                    'type': 'tap'
+                }
+            }
+            requests.post('http://127.0.0.1:5000/gesture', data=json.dumps(data) )
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

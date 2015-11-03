@@ -1,4 +1,5 @@
 venv/
+instance/
 .eggs/
 *.egg-info
 *.pyc

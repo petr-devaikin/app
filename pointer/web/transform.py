@@ -5,7 +5,8 @@ import numpy as np
 import cv2
 
 
-def transform(img_data, x, y):
+
+def get_matrix(img_data):
     img = convert_image(img_data)
     dm = detect_markers(img)
 
@@ -22,13 +23,16 @@ def transform(img_data, x, y):
         #for p in points:
         #    print p['id']
         #print '------'
-        m = calc_transform(points)
-        if m != None:
-            p = np.float32([x, y, 1])
-            pt = p.dot(m.T)
-            return (pt[0], pt[1])
+        return calc_transform(points)
 
     return None
+
+
+def convert_coords(m, x, y):
+    p = np.float32([x, y, 1])
+    pt = p.dot(m.T)
+    return (pt[0], pt[1])
+
 
 def convert_image(data):
     image = np.asarray(bytearray(data), dtype="uint8")
