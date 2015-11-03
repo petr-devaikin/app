@@ -27,11 +27,15 @@ matrix = None
 def image():
     if 'img' in request.files:
         print 'get image file'
+        #request.files['img'].save('file.jpg')
         img = request.files['img'].read()
-    else:
+    elif request.data:
         print 'get base64 image'
         data = json.loads(request.data)
         img = grab_image(data['img'])
+    else:
+        return jsonify(result='empty request'), 500
+
 
     m = get_matrix(img)
     if m != None:
