@@ -11,7 +11,7 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/', function(req, res, next) {
-  console.log(data);
+  //console.log(data);
   res.send(data);
 });
 

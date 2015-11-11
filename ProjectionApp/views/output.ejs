@@ -7,7 +7,7 @@
     <style>
       #topleft, #topright, #bottomleft, #bottomright {
         position:fixed;
-        z-index: 999;
+        z-index: 999999999999;
       }
 
       .bodyPanel{
@@ -26,7 +26,8 @@
       <img src="/images/bottomleft.png" id="bottomleft"/>
       <img src="/images/bottomright.png" id="bottomright"/>
     </div>
-    <canvas id="can"  style="cursor:pointer; position:fixed; top:0; left:0;"></canvas>
+    <canvas id="can"  style="cursor:pointer; position:fixed; top:0; left:0; z-index:-10"></canvas>
+    <img id="canimg" src="" style="position:fixed; top:0; left:0; z-index:-15" />
     
     <script type="text/javascript" src="/javascripts/artist.js"></script>
   </body>

@@ -13,7 +13,8 @@ values["threeY"] = 148,
 values["fourX"] = 221,
 values["fourY"] = 148;
 
-var bodyPanel = $("#bodyPanel");	
+var bodyPanel = $("#bodyPanel");
+var canImg = $("#canimg");
 
 function init() {
 	canvas = document.getElementById('can');
@@ -34,8 +35,10 @@ function setPanelSize(bodyPanel){
 	var wHeight = window.innerHeight - 10;
 	bodyPanel.height = wHeight;
 	bodyPanel.css("height",wHeight+"px");
+	canImg.css("height",wHeight+"px");
 	bodyPanel.width = wHeight * ratio;
 	bodyPanel.css("width",wHeight * ratio+"px");
+	canImg.css("width",wHeight * ratio+"px");
 }
 
 function setMarkerPositions(one, two, three, four, bodyPanel){
@@ -65,7 +68,7 @@ function setMarkerPositions(one, two, three, four, bodyPanel){
 }
 
 function getHeightWidthRatio(height, width){
-return width/height;
+	return width/height;
 }
 
 function getMarkerSize(width, size){
@@ -116,7 +119,7 @@ function convertCMtoPXCoordinates(x, y){
 
 $(document).ready(function(){
 	var URL = window.location.hostname;
-	
+	var prevX = 0, prevY = 0, currX = 0, currY = 0;
 	setInterval(function(){ 
 		$.ajax({
 		Method:"GET",
@@ -125,7 +128,34 @@ $(document).ready(function(){
 			if(result != "idle"){
 				var obj = jQuery.parseJSON(result);
 				var coordiantes = convertCMtoPXCoordinates(obj.x,obj.y);
-				ctx.fillRect(coordiantes["x"],coordiantes["y"],3,3);
+				if(obj.action.type == "first"){
+					currX = coordiantes["x"];
+					currY = coordiantes["y"];
+					prevX = currX;
+					prevY = currY;
+				}
+				else if(obj.action.type == "move"){
+					currX = coordiantes["x"];
+					currY = coordiantes["y"];
+					ctx.beginPath();
+					ctx.moveTo(prevX, prevY);
+					ctx.lineTo(currX, currY);
+					ctx.strokeStyle = obj.action.color;
+					ctx.lineWidth = 2;
+					ctx.stroke();
+					ctx.closePath();
+					prevX = currX;
+					prevY = currY;
+				}
+				else if(obj.action.type == "last"){
+					currX = 0;
+					currY = 0;
+					prevX = 0;
+					prevY = 0;
+				}
+				else if(obj.action.type == "background"){
+					canImg.attr("src","data:image/png;base64,"+obj.action.img);
+				}
 			}
 		},
 		error: function(){
