@@ -34,6 +34,7 @@ def image():
         data = json.loads(request.data)
         img = grab_image(data['img'])
     else:
+        print 'no image'
         return jsonify(result='empty request'), 500
 
 
@@ -46,16 +47,36 @@ def image():
         return jsonify(result='cannot find markers'), 404
 
 
+
+@app.route('/background', methods=['POST'])
+def background():
+    if 'img' in request.files:
+        print 'get bg-image file'
+        #request.files['img'].save('file.jpg')
+        img = request.files['img'].read()
+    elif request.data:
+        print 'get bg-base64 image'
+        data = json.loads(request.data)
+        img = grab_image(data['img'])
+    else:
+        print 'no image'
+        return jsonify(result='empty request'), 500
+
+    Adapter.send_background(img)
+    return jsonify(result='bg updated'), 200
+
+
+
 @app.route('/gesture', methods=['POST'])
 def gesture():
     data = json.loads(request.data)
     x = data['x']
     y = data['y']
-    action = data['action']
+    action = json.loads(data['action'])
 
     if matrix != None:
         coords = convert_coords(matrix, x, y)
-        Adapter.send_gesture(coords[0], coords[1], action)
+        Adapter.send_gesture(coords[0] * 222 / 275, coords[1], action)
         return jsonify(result='ok')
     else:
         return jsonify(result='cannot draw points'), 404
