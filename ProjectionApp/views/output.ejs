@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Advanced Programming Project</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src='/javascripts/vendor/jquery-1.11.2.js'></script>
+    <style>
+      #topleft, #topright, #bottomleft, #bottomright {
+        position:fixed;
+        z-index: 999999999999;
+      }
+
+      .bodyPanel{
+        position:fixed;
+        top:0;
+        left:0;
+        border:1px solid #000;
+      }
+    </style>
+  </head>
+  <body onload="init()" onresize="init()">
+    
+    <div class="bodyPanel" id="bodyPanel">
+      <img src="/images/topleft.png" id="topleft"/>
+      <img src="/images/topright.png" id="topright"/>
+      <img src="/images/bottomleft.png" id="bottomleft"/>
+      <img src="/images/bottomright.png" id="bottomright"/>
+    </div>
+    <canvas id="can"  style="cursor:pointer; position:fixed; top:0; left:0; z-index:-10"></canvas>
+    <img id="canimg" src="" style="position:fixed; top:0; left:0; z-index:-15" />
+    
+    <script type="text/javascript" src="/javascripts/artist.js"></script>
+  </body>
+</html>
